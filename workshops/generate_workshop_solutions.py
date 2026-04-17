@@ -58,7 +58,7 @@ import matplotlib.pyplot as plt
 from scipy.linalg import expm
 from IPython.display import Markdown, display
 from qiskit import QuantumCircuit
-from qiskit.quantum_info import Statevector
+from qiskit.quantum_info import Operator, Statevector
 from qiskit.circuit.library import QFTGate
 from qiskit.circuit.library.generalized_gates import UnitaryGate
 
@@ -332,6 +332,55 @@ def team_a_solution_cells() -> list[dict]:
                 }
             )
             display(expected_phase_table)
+            """
+        ),
+        markdown_cell(
+            r"""
+            ## Step 5B — Build the Same $\mathrm{H}_2$ Evolution from Native Gates
+
+            The Hamiltonian itself is not a gate, but its time evolution is.
+
+            For
+
+            $$
+            H = c_{II}II + c_{ZI}ZI + c_{IZ}IZ + c_{ZZ}ZZ + c_{XX}XX,
+            $$
+
+            the identity term is only a global phase, so the nontrivial evolution can be approximated directly with:
+
+            - `rz` for the single-qubit $Z$ terms,
+            - `rzz` for the $ZZ$ term,
+            - a basis change $H \otimes H$, then `rzz`, then $H \otimes H$ for the $XX$ term.
+
+            Because the $XX$ term does not commute with the $Z$ terms, this is a first-order Trotter step rather than the exact matrix exponential.
+            """
+        ),
+        code_cell(
+            r"""
+            h2_gate_evolution = QuantumCircuit(2)
+
+            h2_gate_evolution.rz(2 * tau * h2_coeffs["ZI"], 0)
+            h2_gate_evolution.rz(2 * tau * h2_coeffs["IZ"], 1)
+            h2_gate_evolution.rzz(2 * tau * h2_coeffs["ZZ"], 0, 1)
+
+            h2_gate_evolution.h(0)
+            h2_gate_evolution.h(1)
+            h2_gate_evolution.rzz(2 * tau * h2_coeffs["XX"], 0, 1)
+            h2_gate_evolution.h(0)
+            h2_gate_evolution.h(1)
+
+            trotter_matrix = Operator(h2_gate_evolution).data
+            phase_alignment = np.angle(np.vdot(trotter_matrix.reshape(-1), U_h2.reshape(-1)))
+            trotter_matrix_aligned = np.exp(1j * phase_alignment) * trotter_matrix
+            trotter_error = np.linalg.norm(U_h2 - trotter_matrix_aligned)
+
+            print(h2_gate_evolution.draw(output="text"))
+
+            trotter_table = pd.DataFrame(
+                [["|| U_exact - e^{iα} U_trotter ||", trotter_error]],
+                columns=["Check", "Value"],
+            )
+            display(trotter_table)
             """
         ),
         markdown_cell(
@@ -961,7 +1010,7 @@ def team_b_solution_cells() -> list[dict]:
             QPE should return
 
             $$
-            \phi = -\frac{3}{8}\pmod 1 = \frac{5}{8}.
+            \phi = \operatorname{frac}\!\left(-\frac{3}{8}\right) = \frac{5}{8}.
             $$
             """
         ),
@@ -1107,7 +1156,7 @@ def team_b_solution_cells() -> list[dict]:
                 [
                     ["Unitary", "Spatial translation T", "Modular multiplication U_a"],
                     ["Finite order", "T^8 = I", "U_a^r = I on the cyclic subspace"],
-                    ["Eigenphases", "-n/8 mod 1", "s/r"],
+                    ["Eigenphases", "frac(-n/8) in [0,1)", "s/r in [0,1)"],
                     ["Quantum primitive", "QPE on T", "QPE on modular multiplication"],
                     ["Recovered structure", "Momentum / order 8", "Order r"],
                 ],

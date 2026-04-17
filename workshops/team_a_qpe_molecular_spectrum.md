@@ -48,10 +48,10 @@ then
 U |E_j\rangle = e^{-i E_j \tau} |E_j\rangle = e^{2\pi i \phi_j} |E_j\rangle,
 \]
 
-so the phase \(\phi_j\) measured by QPE contains the energy:
+so the phase \(\phi_j\) measured by QPE contains the energy. More precisely, QPE returns the phase on the interval \([0,1)\), i.e. the fractional part of \(-E_j\tau/(2\pi)\):
 
 \[
-\phi_j = -\frac{E_j \tau}{2\pi} \pmod 1.
+\phi_j = \operatorname{frac}\!\left(-\frac{E_j \tau}{2\pi}\right) \in [0,1).
 \]
 
 Your job is to recover that phase and convert it back into an energy estimate.

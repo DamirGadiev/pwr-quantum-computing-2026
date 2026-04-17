@@ -151,7 +151,7 @@ T|k_n\rangle = e^{-i 2\pi n/8} |k_n\rangle.
 So the eigenphases are discrete fractions:
 \[
 \phi_n = \frac{n}{8}
-\quad \text{(up to sign convention and modulo 1).}
+\quad \text{(up to sign convention, with the phase reported on }[0,1)\text{).}
 \]
 
 ### Tight-binding energies
@@ -256,7 +256,7 @@ For this ring problem:
 - the unitary is $T$,
 - the order is $r=8$,
 - the eigenphases are multiples of $1/8$,
-- QPE should recover numbers of the form $n/8$ modulo sign convention and modulo 1.
+- QPE should recover numbers of the form $n/8$ up to sign convention, reported as phases in the interval $[0,1)$.
 
 This is the exact type of object that appears in Shor:
 - a finite-order unitary,
